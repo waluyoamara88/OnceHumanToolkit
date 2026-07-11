@@ -3,95 +3,84 @@ import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 
-def write(path: str, text: str):
+def write(path, content):
     file = ROOT / path
     file.parent.mkdir(parents=True, exist_ok=True)
-    file.write_text(text.lstrip(), encoding="utf-8")
+    file.write_text(content.lstrip(), encoding="utf-8")
 
-def sprint002():
+def sprint003():
 
-    builders = [
-        "backend",
-        "frontend",
-        "database",
-        "sqlite",
-        "json",
+    plugins = [
         "api",
         "assets",
-        "scraper",
         "calculator",
-        "planner",
-        "website",
-        "docs",
-        "github",
         "cli",
+        "database",
+        "planner",
+        "scraper",
         "updater",
+        "website"
     ]
 
     write(
-        "generator/builders/base_builder.py",
+        "generator/plugins/base_plugin.py",
 '''
 from abc import ABC, abstractmethod
 
-class BaseBuilder(ABC):
+class BasePlugin(ABC):
 
-    NAME = "base"
+    NAME="base"
 
     @abstractmethod
-    def build(self):
+    def register(self):
         ...
 '''
     )
 
-    registry = []
+    imports=[]
+    registry=[]
 
-    for builder in builders:
+    for p in plugins:
 
-        cls = builder.title().replace("_","") + "Builder"
+        cls=p.title()+"Plugin"
 
         write(
-            f"generator/builders/{builder}_builder.py",
+            f"generator/plugins/{p}.py",
 f'''
-from generator.builders.base_builder import BaseBuilder
+from generator.plugins.base_plugin import BasePlugin
 
-class {cls}(BaseBuilder):
+class {cls}(BasePlugin):
 
-    NAME = "{builder}"
+    NAME="{p}"
 
-    def build(self):
-        print("[BUILD]", self.NAME)
+    def register(self):
+        print("[PLUGIN]",self.NAME)
 '''
         )
 
-        registry.append(
-            f"from generator.builders.{builder}_builder import {cls}"
+        imports.append(
+            f"from generator.plugins.{p} import {cls}"
         )
 
-    imports = "\n".join(registry)
-
-    classes = ",\n    ".join(
-        x.title().replace("_","")+"Builder()"
-        for x in builders
-    )
+        registry.append(f"{cls}()")
 
     write(
-        "generator/builders/builder_registry.py",
+        "generator/plugins/plugin_registry.py",
 f'''
-{imports}
+{chr(10).join(imports)}
 
-BUILDERS = [
-    {classes}
+PLUGINS=[
+    {",\n    ".join(registry)}
 ]
 '''
     )
 
-    print("Sprint002 OK")
+    print("Sprint003 Complete")
 
 if __name__=="__main__":
 
     if len(sys.argv)<2:
-        print("python tools/generator.py sprint002")
-        raise SystemExit
+        exit()
 
-    if sys.argv[1]=="sprint002":
-        sprint002()
+    if sys.argv[1]=="sprint003":
+        sprint003()
