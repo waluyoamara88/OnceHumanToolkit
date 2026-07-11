@@ -1,0 +1,7 @@
+﻿project:
+  name: OnceHumanToolkit
+  version: 0.1.0
+  language: python
+  frontend: nextjs
+  backend: fastapi
+  database: sqlite
