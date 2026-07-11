@@ -8,86 +8,75 @@ def write(path, text):
     p.parent.mkdir(parents=True, exist_ok=True)
     p.write_text(text.lstrip(), encoding="utf-8")
 
-def sprint007():
+def sprint008():
 
     write(
-        "generator/core/writer.py",
+        "generator/core/engine.py",
 '''
-from pathlib import Path
+from generator.builders.builder_registry import BUILDERS
 
-class ProjectWriter:
+class GeneratorEngine:
 
-    @staticmethod
-    def write(path, content):
-        p = Path(path)
-        p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_text(content, encoding="utf-8")
+    def run(self):
+
+        print("="*60)
+        print(" OnceHumanToolkit Generator")
+        print("="*60)
+
+        for builder in BUILDERS:
+            print(f"Running {builder.NAME}...")
+            builder.build()
+
+        print("="*60)
+        print("Build Complete")
 '''
     )
 
     write(
-        "generator/core/validator.py",
+        "generator/cli/main.py",
 '''
-from pathlib import Path
+import argparse
 
-class Validator:
+from generator.core.engine import GeneratorEngine
 
-    REQUIRED = [
-        "generator/manifests/project.yaml",
-        "generator/builders/builder_registry.py",
-        "generator/plugins/plugin_registry.py",
-    ]
+def main():
 
-    def validate(self):
+    parser = argparse.ArgumentParser()
 
-        missing = []
-
-        for item in self.REQUIRED:
-            if not Path(item).exists():
-                missing.append(item)
-
-        return missing
-'''
+    parser.add_argument(
+        "command",
+        choices=[
+            "build",
+            "doctor",
+            "validate"
+        ]
     )
 
-    write(
-        "generator/core/exceptions.py",
-'''
-class GeneratorError(Exception):
-    pass
+    args = parser.parse_args()
 
-class ValidationError(GeneratorError):
-    pass
+    if args.command == "build":
+        GeneratorEngine().run()
 
-class BuilderError(GeneratorError):
-    pass
+if __name__=="__main__":
+    main()
 '''
     )
 
     write(
         "generator/build.py",
 '''
-from generator.core.engine import GeneratorEngine
-from generator.core.validator import Validator
+from generator.cli.main import main
 
-missing = Validator().validate()
-
-if missing:
-    print("Missing files:")
-    for m in missing:
-        print(" -", m)
-    raise SystemExit(1)
-
-GeneratorEngine().run()
+main()
 '''
     )
 
-    print("Sprint007 Complete")
+    print("Sprint008 Complete")
 
 if __name__ == "__main__":
 
     if len(sys.argv) < 2:
         raise SystemExit
 
-    if sys.argv[1] == "sprint007":
-        sprint007()
+    if sys.argv[1] == "sprint008":
+        sprint008()
