@@ -1,0 +1,9 @@
+modules:
+  - api
+  - database
+  - website
+  - scraper
+  - assets
+  - planner
+  - calculator
+  - cli

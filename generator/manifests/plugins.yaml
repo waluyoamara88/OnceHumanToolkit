@@ -1,0 +1,8 @@
+plugins:
+  - api
+  - database
+  - scraper
+  - assets
+  - planner
+  - calculator
+  - cli
