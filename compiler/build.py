@@ -1,10 +1,11 @@
-﻿from pathlib import Path
-
-ROOT = Path(__file__).resolve().parent.parent
+﻿from compiler.parser.loader import Project
 
 print("="*60)
-print("OnceHumanToolkit Compiler v0.1")
+print("OnceHumanToolkit Compiler")
 print("="*60)
 
-print("Project :", ROOT.name)
-print("Status  : Ready")
+project=Project()
+
+project.load()
+
+print("Specification Loaded")
