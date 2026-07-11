@@ -8,72 +8,84 @@ def write(path, text):
     file.parent.mkdir(parents=True, exist_ok=True)
     file.write_text(text.lstrip(), encoding="utf-8")
 
-def sprint004():
-
-    manifests = {
-        "project.yaml": """
-name: OnceHumanToolkit
-version: 0.1.0
-license: MIT
-python: "3.14"
-""",
-        "modules.yaml": """
-modules:
-  - api
-  - database
-  - website
-  - scraper
-  - assets
-  - planner
-  - calculator
-  - cli
-""",
-        "plugins.yaml": """
-plugins:
-  - api
-  - database
-  - scraper
-  - assets
-  - planner
-  - calculator
-  - cli
-""",
-        "builders.yaml": """
-builders:
-  - backend
-  - frontend
-  - database
-  - api
-  - website
-"""
-    }
-
-    for name, content in manifests.items():
-        write(f"generator/manifests/{name}", content)
+def sprint005():
 
     write(
-        "generator/core/manifest.py",
+        "generator/core/context.py",
 '''
 from pathlib import Path
-import yaml
 
-class Manifest:
+class BuildContext:
 
     def __init__(self, root):
         self.root = Path(root)
-
-    def load(self, name):
-        with open(self.root / "generator" / "manifests" / name, encoding="utf-8") as f:
-            return yaml.safe_load(f)
+        self.output = self.root
+        self.variables = {}
 '''
     )
 
-    print("Sprint004 Complete")
+    write(
+        "generator/core/filesystem.py",
+'''
+from pathlib import Path
 
-if __name__ == "__main__":
+class FileSystem:
 
-    if len(sys.argv) < 2:
-        raise SystemExit("python tools/generator.py sprint004")
+    @staticmethod
+    def mkdir(path):
+        Path(path).mkdir(parents=True, exist_ok=True)
 
-    if sys.argv[1] == "sprint004":
-        sprint004()
+    @staticmethod
+    def write(path, text):
+        p = Path(path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(text, encoding="utf-8")
+'''
+    )
+
+    write(
+        "generator/core/logger.py",
+'''
+import logging
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s | %(message)s"
+)
+
+logger = logging.getLogger("OnceHumanToolkit")
+'''
+    )
+
+    write(
+        "generator/core/config.py",
+'''
+class Config:
+
+    PROJECT_NAME = "OnceHumanToolkit"
+    VERSION = "0.1.0"
+'''
+    )
+
+    write(
+        "generator/core/registry.py",
+'''
+class Registry:
+
+    def __init__(self):
+        self.items=[]
+
+    def register(self,obj):
+        self.items.append(obj)
+'''
+    )
+
+    print("Sprint005 Complete")
+
+if __name__=="__main__":
+
+    if len(sys.argv)<2:
+        raise SystemExit
+
+    if sys.argv[1]=="sprint005":
+        sprint005()
