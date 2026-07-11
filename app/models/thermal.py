@@ -1,0 +1,2 @@
+﻿class Thermal:
+    pass

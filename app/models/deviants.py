@@ -1,0 +1,2 @@
+﻿class Deviants:
+    pass
