@@ -1,0 +1,2 @@
+﻿class DeviantScraper:
+    pass
