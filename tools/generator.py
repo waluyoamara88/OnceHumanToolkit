@@ -1,43 +1,80 @@
 ﻿from pathlib import Path
-import sys
+import argparse
+import json
 
 ROOT = Path(__file__).resolve().parent.parent
 
-def write(path, text):
-    p = ROOT / path
-    p.parent.mkdir(parents=True, exist_ok=True)
-    p.write_text(text.lstrip(), encoding="utf-8")
+class Generator:
 
-def sprint008():
+    def write(self, path: str, content: str = ""):
+        p = ROOT / path
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(content.lstrip(), encoding="utf-8")
 
-    write(
-        "generator/core/engine.py",
+    def touch(self, path: str):
+        self.write(path)
+
+    def build(self):
+
+        dirs = [
+            "generator/core",
+            "generator/builders",
+            "generator/plugins",
+            "generator/manifests",
+            "generator/templates",
+            "generator/config",
+            "generator/cli",
+            "generator/pipeline",
+
+            "app/api",
+            "app/core",
+            "app/models",
+            "app/schemas",
+            "app/repositories",
+            "app/services",
+            "app/workers",
+
+            "assets",
+            "data/json",
+            "data/sqlite",
+            "docs",
+            "tests"
+        ]
+
+        for d in dirs:
+            (ROOT / d).mkdir(parents=True, exist_ok=True)
+
+        manifest = {
+            "name":"OnceHumanToolkit",
+            "version":"0.1.0",
+            "python":"3.14"
+        }
+
+        self.write(
+            "generator/manifests/project.json",
+            json.dumps(manifest, indent=2)
+        )
+
+        self.write(
+            "generator/core/engine.py",
 '''
-from generator.builders.builder_registry import BUILDERS
-
 class GeneratorEngine:
 
     def run(self):
-
-        print("="*60)
-        print(" OnceHumanToolkit Generator")
-        print("="*60)
-
-        for builder in BUILDERS:
-            print(f"Running {builder.NAME}...")
-            builder.build()
-
-        print("="*60)
-        print("Build Complete")
+        print("Generator Engine Running")
 '''
-    )
+        )
 
-    write(
-        "generator/cli/main.py",
+        self.write(
+            "generator/build.py",
 '''
-import argparse
-
 from generator.core.engine import GeneratorEngine
+
+GeneratorEngine().run()
+'''
+        )
+
+        print("Build Success")
 
 def main():
 
@@ -46,37 +83,16 @@ def main():
     parser.add_argument(
         "command",
         choices=[
-            "build",
-            "doctor",
-            "validate"
+            "build"
         ]
     )
 
     args = parser.parse_args()
 
+    gen = Generator()
+
     if args.command == "build":
-        GeneratorEngine().run()
-
-if __name__=="__main__":
-    main()
-'''
-    )
-
-    write(
-        "generator/build.py",
-'''
-from generator.cli.main import main
-
-main()
-'''
-    )
-
-    print("Sprint008 Complete")
+        gen.build()
 
 if __name__ == "__main__":
-
-    if len(sys.argv) < 2:
-        raise SystemExit
-
-    if sys.argv[1] == "sprint008":
-        sprint008()
+    main()

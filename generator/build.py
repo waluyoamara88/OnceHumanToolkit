@@ -1,3 +1,3 @@
-from generator.cli.main import main
+from generator.core.engine import GeneratorEngine
 
-main()
+GeneratorEngine().run()
